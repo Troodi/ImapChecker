@@ -102,11 +102,13 @@ class ImapChecker
             }
             else
             {
+                Console.WriteLine("Данный сервис невозможно проверить с помощью данного класса");
                 return false;
             }
         }
         catch
         {
+            Console.WriteLine("Произошла неизвестная ошибка при подключении к imap серверу");
             return false;
         }
 
@@ -114,8 +116,8 @@ class ImapChecker
         {
             Console.WriteLine("Попытка авторизации!");
             client.Authenticate(mailData[0], mailData[1]);
-            validated = true;
             Console.WriteLine("Почта успешно авторизовалась!");
+            validated = true;
             //var personal = client.GetFolder(client.PersonalNamespaces[0]);
             //foreach (var folder in personal.GetSubfolders(false))
             //    Console.WriteLine("[folder] {0}", folder.Name);
@@ -162,11 +164,14 @@ class ImapChecker
             SetMail(mail);
             if (ValidateMail())
             {
+                Console.WriteLine("Почта валидна");
                 listValidated.Add(mail);
             } else
             {
+                Console.WriteLine("Почта невалидна");
                 listInvalidated.Add(mail);
             }
+            client.Disconnect(true);
         }
         try
         {
@@ -190,6 +195,15 @@ class ImapChecker
             }
         }
         return true;
+    }
+
+    public void Disconnect()
+    {
+        try
+        {
+            client.Disconnect(true);
+        }
+        catch { }
     }
 
     public bool FindCode(string codeRegex, string mailFrom, ref string link)
