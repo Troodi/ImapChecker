@@ -94,7 +94,7 @@ namespace ImapChecker
                 Console.WriteLine("Попытка авторизации!");
                 client.Authenticate(mailData[0], mailData[1]);
                 Console.WriteLine("Почта успешно авторизовалась!");
-                var personal = client.GetFolder(client.PersonalNamespaces[0]);
+                //var personal = client.GetFolder(client.PersonalNamespaces[0]);
                 //foreach (var folder in personal.GetSubfolders(false))
                 //    Console.WriteLine("[folder] {0}", folder.Name);
                 //Console.ReadLine();
@@ -120,12 +120,10 @@ namespace ImapChecker
             return true;
         }
 
-        public string FindCode(string codeRegex, string mailFrom)
+        public bool FindCode(string codeRegex, string mailFrom, ref string link)
         {
             IMailFolder mail;
-
             var regex = new Regex(codeRegex);
-            var link = "";
             var flag = true;
             var errors = 0;
             while (true)
@@ -180,7 +178,7 @@ namespace ImapChecker
                                 client.Disconnect(true);
                             }
                             catch { }
-                            return link;
+                            return true;
                         }
                         catch
                         {
@@ -194,7 +192,7 @@ namespace ImapChecker
                     if (errors > maxErrors)
                     {
                         Console.WriteLine("Ничего не пришло!");
-                        return "";
+                        return false;
                     }
                 }
                 Thread.Sleep(2000);
