@@ -12,13 +12,13 @@ using System.Threading.Tasks;
 
 namespace ImapChecker
 {
-    class ImapCheker
+    class ImapChecker
     {
         public string[] mailData { get; private set; }
         public ImapClient client;
         public int maxErrors;
 
-        public ImapCheker(string data, int errorLimit = 50)
+        public ImapChecker(string data, int errorLimit = 50)
         {
             maxErrors = errorLimit;
             mailData = data.Split(':');
