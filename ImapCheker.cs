@@ -189,10 +189,13 @@ namespace ImapChecker
                     }
                 }
                 errors++;
-                if (errors > maxErrors)
+                if (maxErrors != 0)
                 {
-                    Console.WriteLine("Ничего не пришло!");
-                    return "";
+                    if (errors > maxErrors)
+                    {
+                        Console.WriteLine("Ничего не пришло!");
+                        return "";
+                    }
                 }
                 Thread.Sleep(2000);
             }
