@@ -12,13 +12,13 @@ using System.Threading.Tasks;
 
 namespace ImapChecker
 {
-    class ImapChecker
+    class ImapCheker
     {
         public string[] mailData { get; private set; }
         public ImapClient client;
         public int maxErrors;
 
-        public ImapChecker(string data, int errorLimit = 50)
+        public ImapCheker(string data, int errorLimit = 50)
         {
             maxErrors = errorLimit;
             mailData = data.Split(':');
@@ -31,25 +31,57 @@ namespace ImapChecker
             Console.WriteLine("Подключение к почтовому сервису");
             try
             {
-                if (mailData[0].Contains("mail.ru"))
+                if (mailData[0].Contains("@mail.ru") || mailData[0].Contains("@inbox.ru") || mailData[0].Contains("@list.ru") || mailData[0].Contains("@bk.ru"))
                 {
                     client.Connect("imap.mail.ru", 993, true);
                 }
-                else if (mailData[0].Contains("hotmail.com"))
+                else if (mailData[0].Contains("@hotmail.com") || mailData[0].Contains("@outlook.com"))
                 {
                     client.Connect("imap-mail.outlook.com", 993, true);
                 }
-                else if (mailData[0].Contains("yahoo.com"))
+                else if (mailData[0].Contains("@yahoo.com"))
                 {
                     client.Connect("imap.mail.yahoo.com", 993, true);
                 }
-                else if (mailData[0].Contains("yandex.ru"))
+                else if (mailData[0].Contains("@yandex.ru") || mailData[0].Contains("@yandex.com") || mailData[0].Contains("@ya.ru") || mailData[0].Contains("@yandex.by") || mailData[0].Contains("@yandex.kz") || mailData[0].Contains("@yandex.ua"))
                 {
                     client.Connect("imap.yandex.ru", 993, true);
                 }
-                else if (mailData[0].Contains("gmail.com"))
+                else if (mailData[0].Contains("@gmail.com"))
                 {
                     client.Connect("imap.gmail.com", 993, true);
+                }
+                else if (mailData[0].Contains("@aol.com"))
+                {
+                    client.Connect("imap.aol.com", 993, true);
+                }
+                else if (mailData[0].Contains("@mail.com"))
+                {
+                    client.Connect("imap.mail.com", 993, true);
+                }
+                else if (mailData[0].Contains("@gmx.com"))
+                {
+                    client.Connect("imap.gmx.com", 993, true);
+                }
+                else if (mailData[0].Contains("@o2.pl"))
+                {
+                    client.Connect("poczta.o2.pl", 993, true);
+                }
+                else if (mailData[0].Contains("@wp.pl"))
+                {
+                    client.Connect("smtp.wp.pl", 993, true);
+                }
+                else if (mailData[0].Contains("@onet.pl"))
+                {
+                    client.Connect("imap.poczta.onet.pl", 993, true);
+                }
+                else if (mailData[0].Contains("@rambler.ru"))
+                {
+                    client.Connect("imap.rambler.ru", 993, true);
+                }
+                else
+                {
+                    return false;
                 }
             }
             catch
