@@ -41,7 +41,7 @@ class ImapChecker
                 Console.WriteLine("Подключаемся к imap.mail.ru");
                 client.Connect("imap.mail.ru", 993, true);
             }
-            else if (mailData[0].Contains("@hotmail.com") || mailData[0].Contains("@outlook.com"))
+            else if (mailData[0].Contains("@hotmail.com") || mailData[0].Contains("@outlook."))
             {
                 Console.WriteLine("Подключаемся к imap-mail.outlook.com");
                 client.Connect("imap-mail.outlook.com", 993, true);
@@ -234,7 +234,7 @@ class ImapChecker
                 try
                 {
                     flag = true;
-                    if (mailData[0].Contains("hotmail.com"))
+                    if (mailData[0].Contains("hotmail.com") || mailData[0].Contains("@outlook."))
                     {
                         mail = client.GetFolder("Junk");
                     }
