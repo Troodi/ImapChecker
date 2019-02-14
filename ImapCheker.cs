@@ -234,11 +234,11 @@ class ImapChecker
                 try
                 {
                     flag = true;
-                    if (mailData[0].Contains("hotmail.com") || mailData[0].Contains("@outlook."))
+                    if (mailData[0].Contains("@hotmail.com") || mailData[0].Contains("@outlook."))
                     {
                         mail = client.GetFolder("Junk");
                     }
-                    else if (mailData[0].Contains("yahoo.com"))
+                    else if (mailData[0].Contains("@yahoo.com"))
                     {
                         mail = client.GetFolder("Bulk Mail");
                     }
@@ -252,35 +252,38 @@ class ImapChecker
                 {
                     mail = null;
                 }
-                Console.WriteLine("Поиск письма в спам");
+                Console.WriteLine("Поиск письма в спам (если есть такая папка)");
             }
-            for (int i = 0; i < mail.Count; i++)
+            if (mail != null)
             {
-                var msg = mail.GetMessage(i);
-                if (msg.From.ToString().Contains(mailFrom))
+                for (int i = 0; i < mail.Count; i++)
                 {
-                    Console.WriteLine("Письмо найдено!");
-                    Match match;
-                    try
+                    var msg = mail.GetMessage(i);
+                    if (msg.From.ToString().Contains(mailFrom))
                     {
-                        match = regex.Match(WebUtility.HtmlDecode(msg.HtmlBody));
-                        link = match.Groups[0].ToString();
-                        Console.WriteLine("Ссылка успешно разобрана!");
-                        Console.WriteLine("Ссылка: " + link);
+                        Console.WriteLine("Письмо найдено!");
+                        Match match;
                         try
                         {
-                            client.Disconnect(true);
+                            match = regex.Match(WebUtility.HtmlDecode(msg.HtmlBody));
+                            link = match.Groups[0].ToString();
+                            Console.WriteLine("Ссылка успешно разобрана!");
+                            Console.WriteLine("Ссылка: " + link);
+                            try
+                            {
+                                client.Disconnect(true);
+                            }
+                            catch { }
+                            return true;
                         }
-                        catch { }
-                        return true;
-                    }
-                    catch
-                    {
-                        Console.WriteLine("Не удалось найти ссылку!");
+                        catch
+                        {
+                            Console.WriteLine("Не удалось найти ссылку!");
+                        }
                     }
                 }
+                errors++;
             }
-            errors++;
             if (maxErrors != 0)
             {
                 if (errors > maxErrors)
