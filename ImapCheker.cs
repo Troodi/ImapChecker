@@ -28,7 +28,7 @@ class ImapChecker
 
     public bool ValidateMail()
     {
-        if(mailData == null)
+        if (mailData == null)
         {
             Console.WriteLine("Не введена почта для проверки!");
             return false;
@@ -51,7 +51,7 @@ class ImapChecker
                 Console.WriteLine("Подключаемся к imap.mail.yahoo.com");
                 client.Connect("imap.mail.yahoo.com", 993, true);
             }
-            else if (mailData[0].Contains("@yandex.ru") || mailData[0].Contains("@yandex.com") || mailData[0].Contains("@ya.ru") || mailData[0].Contains("@yandex.by") || mailData[0].Contains("@yandex.kz") || mailData[0].Contains("@yandex.ua"))
+            else if (mailData[0].Contains("@yandex.") || mailData[0].Contains("@ya.ru"))
             {
                 Console.WriteLine("Подключаемся к imap.yandex.ru");
                 client.Connect("imap.yandex.ru", 993, true);
@@ -71,7 +71,7 @@ class ImapChecker
                 Console.WriteLine("Подключаемся к imap.mail.com");
                 client.Connect("imap.mail.com", 993, true);
             }
-            else if (mailData[0].Contains("@gmx.com"))
+            else if (mailData[0].Contains("@gmx."))
             {
                 Console.WriteLine("Подключаемся к imap.gmx.com");
                 client.Connect("imap.gmx.com", 993, true);
@@ -148,12 +148,13 @@ class ImapChecker
         {
             toCheckMails = File.ReadAllLines(pathFrom);
         }
-        catch {
+        catch
+        {
             Console.WriteLine("Не удалось открыть файл с почтами");
             return false;
         }
         var listValidated = new List<string>();
-        var listInvalidated= new List<string>();
+        var listInvalidated = new List<string>();
         foreach (var mail in toCheckMails)
         {
             Console.WriteLine("Проверка почты: " + mail);
@@ -162,7 +163,8 @@ class ImapChecker
             {
                 Console.WriteLine("Почта валидна");
                 listValidated.Add(mail);
-            } else
+            }
+            else
             {
                 Console.WriteLine("Почта невалидна");
                 listInvalidated.Add(mail);
