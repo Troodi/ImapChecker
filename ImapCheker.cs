@@ -226,7 +226,7 @@ class ImapChecker
             {
                 flag = false;
                 mail = client.GetFolder("inbox");
-                mail.Open(FolderAccess.ReadOnly);
+                mail.Open(FolderAccess.ReadWrite);
                 Console.WriteLine("Поиск письма во входящих");
             }
             else
@@ -246,7 +246,7 @@ class ImapChecker
                     {
                         mail = client.GetFolder(SpecialFolder.Junk);
                     }
-                    mail.Open(FolderAccess.ReadOnly);
+                    mail.Open(FolderAccess.ReadWrite);
                 }
                 catch
                 {
@@ -256,7 +256,7 @@ class ImapChecker
             }
             if (mail != null)
             {
-                for (int i = 0; i < mail.Count; i++)
+                for (int i = mail.Count-1; i > 0; i--)
                 {
                     var msg = mail.GetMessage(i);
                     if (msg.From.ToString().Contains(mailFrom))
@@ -267,6 +267,7 @@ class ImapChecker
                         {
                             match = regex.Match(WebUtility.HtmlDecode(msg.HtmlBody));
                             link = match.Groups[0].ToString();
+                            mail.AddFlags(i, MessageFlags.Seen, true);
                             Console.WriteLine("Ссылка успешно разобрана!");
                             Console.WriteLine("Ссылка: " + link);
                             try
