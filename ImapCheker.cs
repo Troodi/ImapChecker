@@ -6,11 +6,12 @@ using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 
 class ImapChecker
 {
-    private string[] mailData { get; set; }
-    private ImapClient client;
+    static private string[] mailData { get; set; }
+    static private ImapClient client;
     private int maxErrors;
     private bool validated = false;
 
@@ -26,8 +27,22 @@ class ImapChecker
         mailData = data.Split(':');
     }
 
-    public bool ValidateMail()
+    public bool ValidateMail(string mailWithPassword = null)
     {
+        string[] mailData;
+        ImapClient client;
+
+        if (mailWithPassword != null)
+        {
+            mailData = mailWithPassword.Split(':');
+            client = new ImapClient();
+            client.ServerCertificateValidationCallback = (s, c, h, e) => true;
+        } else
+        {
+            mailData = ImapChecker.mailData;
+            client = ImapChecker.client;
+        }
+
         if (mailData == null)
         {
             Console.WriteLine("Не введена почта для проверки!");
@@ -102,17 +117,22 @@ class ImapChecker
                 return false;
             }
         }
-        catch
+        catch (Exception ex)
         {
             Console.WriteLine("Произошла неизвестная ошибка при подключении к imap серверу");
+            Console.WriteLine(ex.Message);
             return false;
         }
 
         try
         {
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
             Console.WriteLine("Попытка авторизации!");
+            Console.ForegroundColor = ConsoleColor.DarkBlue;
             client.Authenticate(mailData[0], mailData[1]);
+            Console.ForegroundColor = ConsoleColor.DarkCyan;
             Console.WriteLine("Почта успешно авторизовалась!");
+            Console.ForegroundColor = ConsoleColor.DarkBlue;
             validated = true;
             //var personal = client.GetFolder(client.PersonalNamespaces[0]);
             //foreach (var folder in personal.GetSubfolders(false))
@@ -133,10 +153,20 @@ class ImapChecker
             mail.Open(FolderAccess.ReadOnly);
             Console.WriteLine("Список сообщений получен успешно!");
         }
-        catch
+        catch(Exception ex)
         {
+            Console.ForegroundColor = ConsoleColor.DarkRed;
             Console.WriteLine("Невозможно получить список сообщений!");
+            Console.WriteLine(ex.Message);
+            Console.ForegroundColor = ConsoleColor.DarkBlue;
             return false;
+        }
+        finally
+        {
+            if (mailWithPassword != null)
+            {
+                client.Disconnect(true);
+            }
         }
         return true;
     }
@@ -204,6 +234,22 @@ class ImapChecker
         catch { }
     }
 
+    public void checkFileMails(string path, string saveValid, string saveBroken = null)
+    {
+        var validEmailsToWrite = new List<string>(); 
+        Parallel.ForEach(File.ReadLines(path), (line, _, lineNumber) =>
+        {
+            if (ValidateMail(line))
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                Console.WriteLine(lineNumber + " - " + line);
+                validEmailsToWrite.Add(line);
+                Console.ForegroundColor = ConsoleColor.DarkBlue;
+            }
+        });
+        File.WriteAllLines(saveValid, validEmailsToWrite.ToArray());
+    }
+
     public bool FindCode(string codeRegex, string mailFrom, ref string link)
     {
         if (mailData == null)
@@ -256,7 +302,7 @@ class ImapChecker
             }
             if (mail != null)
             {
-                for (int i = mail.Count-1; i > 0; i--)
+                for (int i = mail.Count - 1; i > 0; i--)
                 {
                     var msg = mail.GetMessage(i);
                     if (msg.From.ToString().Contains(mailFrom))
